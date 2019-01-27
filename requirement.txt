@@ -1,0 +1,31 @@
+ASSIGNMENT FOR “FULLSTACK DEVELOPER” POSITION
+
+Home Test for Middle/Senior Fullstack Developer
+
+A. UX/UI Specifications:
+------------------------
+
+There will be a homepage and an admin page which will display the data from the changes in the admin page.`
+
++ A homepage for listing books.
++ An admin page to add/edit/delete the books in the database.
+
+
+B. Technical Specifications:
+------------------------
+
++ Using MongoDB for Database.
++ Using NodeJS and Express for BackEnd
++ Using React, Redux for FrontEnd
+
+*Make your own decision of UI for the homepage and the admin page.
+
+
+C. DEMO:
+------------------------
+
++ Send only 1 link of the Github repository. 
++ Send the link of the demo.
++ README.md with the details of how to set up the web app. 
+
+*Please check carefully before sending the Github link.
