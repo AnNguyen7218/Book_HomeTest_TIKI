@@ -6,16 +6,26 @@ export default class Admin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      books: []
+      books: [],
+      title: '',
+      author:''
     }
 
     this.getBooks = this.getBooks.bind(this)
     this.onEdit = this.onEdit.bind(this)
     this.onDelete = this.onDelete.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
   }
   
   componentDidMount(){
     this.getBooks();
+  }
+
+  handleInputChange(e){
+    console.log(e.target.name,e.target.value);
+    this.setState({
+      [e.target.name]: e.target.value
+    });
   }
 
   getBooks () {
@@ -33,7 +43,35 @@ export default class Admin extends Component {
   }
 
   createBook () {
-
+    let x = this
+    let book = {
+      title: x.state.title,
+      author: x.state.author
+    }
+    
+    fetch("http://localhost:8000/books/new",
+    {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        book
+      })
+    })
+    .then(function(res) {
+      return res.json()
+    })
+    .then(function(data) {
+      if(data.success) {
+        this.setState({
+          title: '',
+          author: ''
+        });
+        window.location.reload()
+      }
+    })
   }
 
   onEdit (item) {
@@ -103,13 +141,16 @@ export default class Admin extends Component {
             <form>
               <div class="form-group">
                 <label for="title">Title</label>
-                <input type="text" class="form-control" id="title" aria-describedby="title" placeholder="Enter title"/>
+                <input type="text" class="form-control" name='title' id="title"
+                        aria-describedby="title" placeholder="Enter title" required 
+                        onChange ={this.handleInputChange}/>
               </div>
               <div class="form-group">
                 <label for="author">Author</label>
-                <input type="text" class="form-control" id="author" placeholder="Enter Author"/>
+                <input type="text" class="form-control" name='author' id="author" placeholder="Enter Author" 
+                        required onChange ={this.handleInputChange}/>
               </div>
-              <button class="btn btn-primary disabled">Add New</button>
+              <button onClick = {() => this.createBook()} class="btn btn-primary">Add New</button>
             </form>
           </div>
         </div>
