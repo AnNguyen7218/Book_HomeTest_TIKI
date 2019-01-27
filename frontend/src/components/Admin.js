@@ -37,28 +37,30 @@ export default class Admin extends Component {
   }
 
   onEdit (item) {
-    console.log('onedit',item)
+    
   }
 
   onDelete (item) {
-    console.log('ondelete',item)
-    var payload = {
-      bookID : item._id
-    };
-    
-    var data = new FormData();
-    data.append( "json", JSON.stringify( payload ) );
+    let x = this
     
     fetch("http://localhost:8000/books/delete",
     {
-        method: "POST",
-        body: data
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bookID : item._id
+      })
     })
     .then(function(res) {
-      console.log(res)
+      return res.json()
     })
     .then(function(data) {
-      console.log(JSON.stringify(data))
+      if(data.success) {
+        window.location.reload()
+      }
     })
   }
   
@@ -71,6 +73,7 @@ export default class Admin extends Component {
           Admin Dashboard
         </h3>
         <div className='row'>
+          
           <table className="table table-hover">
             <thead>
               <tr>
@@ -94,6 +97,21 @@ export default class Admin extends Component {
               }
             </tbody>
           </table>
+
+          <div className="add-ct">
+            <h6>Add New Book</h6>
+            <form>
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" id="title" aria-describedby="title" placeholder="Enter title"/>
+              </div>
+              <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" class="form-control" id="author" placeholder="Enter Author"/>
+              </div>
+              <button class="btn btn-primary disabled">Add New</button>
+            </form>
+          </div>
         </div>
       </div>
     );

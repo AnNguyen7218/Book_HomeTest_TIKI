@@ -47,7 +47,7 @@ class Home extends Component {
         </h3>
         <div className='row'>
           {s.books.map((book, index) => 
-            (<Book book = {book}/>)
+            ((!book.isDeleted)?<Book key={index} book = {book}/>:'')
           )}
         </div>
       </div>

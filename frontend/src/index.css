@@ -46,3 +46,12 @@ article {
 .des-ct .author {
   font-style: italic;
 }
+
+.add-ct {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.disabled {
+  cursor: not-allowed;
+}

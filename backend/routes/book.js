@@ -6,6 +6,6 @@ var bookAPI = require('../apis/book')
 router.get('/', bookAPI.getBooks)
 router.post('/new', bookAPI.newBook)
 router.post('/edit', bookAPI.editBook)
-router.delete('/delete', bookAPI.deleteBook)
+router.post('/delete', bookAPI.deleteBook)
 
 module.exports = router;
