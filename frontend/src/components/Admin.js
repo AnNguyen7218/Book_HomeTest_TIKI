@@ -8,7 +8,11 @@ export default class Admin extends Component {
     this.state = {
       books: [],
       title: '',
-      author:''
+      author:'',
+      editable : false,
+      editedObj: {},
+      edit_title:'',
+      edit_author:''
     }
 
     this.getBooks = this.getBooks.bind(this)
@@ -75,7 +79,46 @@ export default class Admin extends Component {
   }
 
   onEdit (item) {
-    
+    let x = this
+
+    this.setState({
+      editable: true,
+      editedObj: item
+    });
+
+    setTimeout(() => {
+      document.getElementById('edit_title').value = item.title
+      document.getElementById('edit_author').value = item.author
+    }, 100);
+  }
+
+  submitEdit () {
+    let item = this.state.editedObj
+
+    fetch("http://localhost:8000/books/edit",
+    {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bookID : item._id,
+        updatedBook : item
+      })
+    })
+    .then(function(res) {
+      return res.json()
+    })
+    .then(function(data) {
+      if(data.success) {
+        this.setState({
+          editable: false,
+          editedObj: {}
+        });
+        window.location.reload()
+      }
+    })
   }
 
   onDelete (item) {
@@ -135,24 +178,45 @@ export default class Admin extends Component {
               }
             </tbody>
           </table>
-
-          <div className="add-ct">
+        </div>
+        <div className='row'>
+          <div className="add-ct col-md-4">
             <h6>Add New Book</h6>
             <form>
-              <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" class="form-control" name='title' id="title"
+              <div className="form-group">
+                <label >Title</label>
+                <input type="text" className="form-control" name='title' id="title"
                         aria-describedby="title" placeholder="Enter title" required 
                         onChange ={this.handleInputChange}/>
               </div>
-              <div class="form-group">
-                <label for="author">Author</label>
-                <input type="text" class="form-control" name='author' id="author" placeholder="Enter Author" 
+              <div className="form-group">
+                <label >Author</label>
+                <input type="text" className="form-control" name='author' id="author" placeholder="Enter Author" 
                         required onChange ={this.handleInputChange}/>
               </div>
-              <button onClick = {() => this.createBook()} class="btn btn-primary">Add New</button>
+              <button onClick = {() => this.createBook()} className="btn btn-primary">Add New</button>
             </form>
           </div>
+          {(x.state.editable)
+            ?
+            <div className="add-ct col-md-8">
+              <h6>Edit Book</h6>
+              <form>
+                <div className="form-group">
+                  <label >Title</label>
+                  <input type="text" className="form-control" name='edit_title' id="edit_title"
+                          aria-describedby="title" placeholder="Enter title" required 
+                          onChange ={this.handleInputChange}/>
+                </div>
+                <div className="form-group">
+                  <label >Author</label>
+                  <input type="text" className="form-control" name='edit_author' id="edit_author" placeholder="Enter Author" 
+                          required onChange ={this.handleInputChange}/>
+                </div>
+                <button onClick = {() => this.submitEdit()} className="btn btn-primary">Update</button>
+              </form>
+            </div>
+            :''}
         </div>
       </div>
     );
