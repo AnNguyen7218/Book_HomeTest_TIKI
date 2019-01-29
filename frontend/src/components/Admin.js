@@ -6,16 +6,37 @@ export default class Admin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      books: []
+      books: [],
+      title: '',
+      author:'',
+      editable : false,
+      editedObj: {},
+      edit_title:'',
+      edit_author:'',
+      edit_delete_state: false
     }
 
     this.getBooks = this.getBooks.bind(this)
     this.onEdit = this.onEdit.bind(this)
     this.onDelete = this.onDelete.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
   }
   
   componentDidMount(){
     this.getBooks();
+  }
+
+  handleInputChange(e){
+    console.log(e.target.name,e.target.value);
+    if (e.target.name === 'edit_delete_state') {
+      this.setState({
+        edit_delete_state: document.getElementById("edit_delete_state").checked
+      });
+    } else {
+      this.setState({
+        [e.target.name]: e.target.value
+      });
+    }
   }
 
   getBooks () {
@@ -33,11 +54,87 @@ export default class Admin extends Component {
   }
 
   createBook () {
-
+    let x = this
+    let book = {
+      title: x.state.title,
+      author: x.state.author
+    }
+    
+    fetch("http://localhost:8000/books/new",
+    {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        book
+      })
+    })
+    .then(function(res) {
+      return res.json()
+    })
+    .then(function(data) {
+      if(data.success) {
+        this.setState({
+          title: '',
+          author: ''
+        });
+        window.location.reload()
+      }
+    })
   }
 
   onEdit (item) {
-    
+
+    this.setState({
+      editable: true,
+      editedObj: item,
+      edit_title: item.title,
+      edit_author: item.author,
+      edit_delete_state: item.isDeleted
+    });
+
+    setTimeout(() => {
+      document.getElementById('edit_title').value = item.title
+      document.getElementById('edit_author').value = item.author
+      document.getElementById('edit_delete_state').checked = item.isDeleted
+    }, 100);
+  }
+
+  submitEdit () {
+    let x = this
+    let item = x.state.editedObj
+    let updatedBook = {
+      title: x.state.edit_title,
+      author: x.state.edit_author,
+      isDeleted: x.state.edit_delete_state
+    }
+
+    fetch("http://localhost:8000/books/edit",
+    {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bookID : item._id,
+        updatedBook
+      })
+    })
+    .then(function(res) {
+      return res.json()
+    })
+    .then(function(data) {
+      if(data.success) {
+        this.setState({
+          editable: false,
+          editedObj: {}
+        });
+        window.location.reload()
+      }
+    })
   }
 
   onDelete (item) {
@@ -97,21 +194,49 @@ export default class Admin extends Component {
               }
             </tbody>
           </table>
-
-          <div className="add-ct">
+        </div>
+        <div className='row'>
+          <div className="add-ct col-md-4">
             <h6>Add New Book</h6>
             <form>
-              <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" class="form-control" id="title" aria-describedby="title" placeholder="Enter title"/>
+              <div className="form-group">
+                <label >Title</label>
+                <input type="text" className="form-control" name='title' id="title"
+                        aria-describedby="title" placeholder="Enter title" required 
+                        onChange ={this.handleInputChange}/>
               </div>
-              <div class="form-group">
-                <label for="author">Author</label>
-                <input type="text" class="form-control" id="author" placeholder="Enter Author"/>
+              <div className="form-group">
+                <label >Author</label>
+                <input type="text" className="form-control" name='author' id="author" placeholder="Enter Author" 
+                        required onChange ={this.handleInputChange}/>
               </div>
-              <button class="btn btn-primary disabled">Add New</button>
+              <button onClick = {() => this.createBook()} className="btn btn-primary">Add New</button>
             </form>
           </div>
+          {(x.state.editable)
+            ?
+            <div className="add-ct col-md-8">
+              <h6>Edit Book</h6>
+              <form>
+                <div className="form-group">
+                  <label >Title</label>
+                  <input type="text" className="form-control" name='edit_title' id="edit_title"
+                          aria-describedby="title" placeholder="Enter title" required 
+                          onChange ={this.handleInputChange}/>
+                </div>
+                <div className="form-group">
+                  <label >Author</label>
+                  <input type="text" className="form-control" name='edit_author' id="edit_author" placeholder="Enter Author" 
+                          required onChange ={this.handleInputChange}/>
+                </div>
+                <div className="form-check">
+                  <input type="checkbox" className="form-check-input" name='edit_delete_state' id="edit_delete_state" onChange ={this.handleInputChange}/>
+                  <label className="form-check-label" >Deleted</label>
+                </div>
+                <button onClick = {() => this.submitEdit()} className="btn btn-primary">Update</button>
+              </form>
+            </div>
+            :''}
         </div>
       </div>
     );

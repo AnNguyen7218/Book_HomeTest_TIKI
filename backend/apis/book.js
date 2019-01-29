@@ -31,10 +31,10 @@ function newBook (req, res) {
 
 function editBook (req, res) {
   var bookID = req.body.bookID
-  var updatedBook = req.body.book
+  var updatedBook = req.body.updatedBook
 
   req.assert('bookID', 'Book ID cannot be blank').notEmpty();
-  req.assert('book', 'Book cannot be blank').notEmpty();
+  req.assert('updatedBook', 'Book cannot be blank').notEmpty();
 
   var errors = req.validationErrors();
 
@@ -42,10 +42,7 @@ function editBook (req, res) {
 		return res.status(500).json({ success: false, message: "Validation failed", errors: errors });
   }
 
-  Book.findById(bookID)
-  .then((book) => {
-    return book.editBookInfo(updatedBook)
-  })
+  Book.editBookInfo(bookID, updatedBook)
   .then(updated => {
     res.json({success: true, book: updated})
   })
