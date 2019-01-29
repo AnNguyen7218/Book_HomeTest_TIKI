@@ -64,17 +64,16 @@ function deleteBook(bookID) {
   })
 }
 
-function editBookInfo(info) {
-  var book = this
+function editBookInfo(id, info) {
 
-  for(var key in info) {
-    book[key] = info[key]
-  }
-
-  return book.model('book').update({
-    _id: book._id
+  return Book.update({
+    _id: id
   },{
-    book
+    $set:{
+      title: info.title,
+      author: info.author,
+      isDeleted: info.isDeleted
+    }
   })
 }
 
@@ -83,15 +82,15 @@ function getBooks () {
 }
 
 BookSchema.methods = {
-  findByType,
-  editBookInfo
+  findByType
 }
 
 BookSchema.statics = {
   createNewBook,
   findBooksWithType,
   deleteBook,
-  getBooks
+  getBooks,
+  editBookInfo
 }
 
 const Book = mongoose.model('book', BookSchema);

@@ -12,7 +12,8 @@ export default class Admin extends Component {
       editable : false,
       editedObj: {},
       edit_title:'',
-      edit_author:''
+      edit_author:'',
+      edit_delete_state: false
     }
 
     this.getBooks = this.getBooks.bind(this)
@@ -27,9 +28,15 @@ export default class Admin extends Component {
 
   handleInputChange(e){
     console.log(e.target.name,e.target.value);
-    this.setState({
-      [e.target.name]: e.target.value
-    });
+    if (e.target.name === 'edit_delete_state') {
+      this.setState({
+        edit_delete_state: document.getElementById("edit_delete_state").checked
+      });
+    } else {
+      this.setState({
+        [e.target.name]: e.target.value
+      });
+    }
   }
 
   getBooks () {
@@ -79,21 +86,30 @@ export default class Admin extends Component {
   }
 
   onEdit (item) {
-    let x = this
 
     this.setState({
       editable: true,
-      editedObj: item
+      editedObj: item,
+      edit_title: item.title,
+      edit_author: item.author,
+      edit_delete_state: item.isDeleted
     });
 
     setTimeout(() => {
       document.getElementById('edit_title').value = item.title
       document.getElementById('edit_author').value = item.author
+      document.getElementById('edit_delete_state').checked = item.isDeleted
     }, 100);
   }
 
   submitEdit () {
-    let item = this.state.editedObj
+    let x = this
+    let item = x.state.editedObj
+    let updatedBook = {
+      title: x.state.edit_title,
+      author: x.state.edit_author,
+      isDeleted: x.state.edit_delete_state
+    }
 
     fetch("http://localhost:8000/books/edit",
     {
@@ -104,7 +120,7 @@ export default class Admin extends Component {
       },
       body: JSON.stringify({
         bookID : item._id,
-        updatedBook : item
+        updatedBook
       })
     })
     .then(function(res) {
@@ -212,6 +228,10 @@ export default class Admin extends Component {
                   <label >Author</label>
                   <input type="text" className="form-control" name='edit_author' id="edit_author" placeholder="Enter Author" 
                           required onChange ={this.handleInputChange}/>
+                </div>
+                <div className="form-check">
+                  <input type="checkbox" className="form-check-input" name='edit_delete_state' id="edit_delete_state" onChange ={this.handleInputChange}/>
+                  <label className="form-check-label" >Deleted</label>
                 </div>
                 <button onClick = {() => this.submitEdit()} className="btn btn-primary">Update</button>
               </form>
