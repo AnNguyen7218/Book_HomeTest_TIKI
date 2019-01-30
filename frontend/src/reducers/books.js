@@ -4,7 +4,10 @@ import {
   DELETE_BOOK,
   ADD_BOOK } from '../actions/types';
   
-  export default function(state={}, action) {
+  const initialState = {
+    books: [] }
+
+  export default function(state=initialState, action) {
     switch (action.type) {
       case GET_BOOKS:
         return { ...state, books: action.payload }

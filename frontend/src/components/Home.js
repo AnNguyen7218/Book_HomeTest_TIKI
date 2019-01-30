@@ -2,44 +2,16 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 
 import { getBooks } from '../actions'
-
 import Book from './Book'
 
 class Home extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      books : []
-    }
-
-    this.getBooks = this.getBooks.bind(this)
-  }
-  componentWillMount () {
-    this.props.dispatch(getBooks())
-    console.log(this.props)
-  }
 
   componentDidMount() {
-    this.getBooks()
-  }
-
-  getBooks () {
-    fetch('http://localhost:8000/books')
-    .then(response => response.json())
-    .then((result) => {
-      console.log('result', result)
-      if(result.success)
-        this.setState({
-          books: result.books
-        });
-    }).catch((err) => {
-      console.log(err)
-    });
+    this.props.getBooks();
   }
 
   render () {
-    let s = this.state;
+    let s = this.props;
     return (
       <div className="container">
         <h3>
@@ -58,15 +30,14 @@ class Home extends Component {
 
 function mapStateToProps(state) {
   return {
-    book: state.book
+    books: state.booksReducer.books
   }
 }
 
-// function mapDispatchToProps(dispatch) {
-//   return {
-//     getBooks: () => dispatch(getBooks())
-//   }
-// }
+function mapDispatchToProps(dispatch) {
+  return {
+    getBooks: () => dispatch(getBooks())
+  }
+}
 
-export default connect(mapStateToProps)(Home)
-// export default Home;
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

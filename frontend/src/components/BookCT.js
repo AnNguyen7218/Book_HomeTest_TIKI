@@ -23,7 +23,7 @@ export default class Book extends Component {
         <td>{s.book.author}</td>
         <td>{s.book.isDeleted?'Deleted':''}</td>
         <td>
-          <a onClick = {x.props.onEdit} href='javascript:;'> Edit </a>
+          <a onClick = {x.props.onEdit} href='#edit'> Edit </a>
         </td>
         <td>
           <a onClick = {x.props.onDelete} href='javascript:;'> Delete </a>

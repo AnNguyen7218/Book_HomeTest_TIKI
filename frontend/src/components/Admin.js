@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
+import {connect} from 'react-redux';
 
+import { getBooks, addBook, editBook, deleteBook } from '../actions'
 import BookCT from './BookCT'
 
-export default class Admin extends Component {
+class Admin extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,18 +18,20 @@ export default class Admin extends Component {
       edit_delete_state: false
     }
 
-    this.getBooks = this.getBooks.bind(this)
     this.onEdit = this.onEdit.bind(this)
     this.onDelete = this.onDelete.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
   }
-  
-  componentDidMount(){
-    this.getBooks();
+
+  componentWillReceiveProps(nextprops) {
+    // console.log('next', nextprops)
+  }
+
+  componentDidMount() {
+    this.props.getBooks();
   }
 
   handleInputChange(e){
-    console.log(e.target.name,e.target.value);
     if (e.target.name === 'edit_delete_state') {
       this.setState({
         edit_delete_state: document.getElementById("edit_delete_state").checked
@@ -39,20 +43,6 @@ export default class Admin extends Component {
     }
   }
 
-  getBooks () {
-    fetch('http://localhost:8000/books')
-    .then(response => response.json())
-    .then((result) => {
-      console.log('result', result)
-      if(result.success)
-        this.setState({
-          books: result.books
-        });
-    }).catch((err) => {
-      console.log(err)
-    });
-  }
-
   createBook () {
     let x = this
     let book = {
@@ -60,29 +50,12 @@ export default class Admin extends Component {
       author: x.state.author
     }
     
-    fetch("http://localhost:8000/books/new",
-    {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        book
-      })
-    })
-    .then(function(res) {
-      return res.json()
-    })
-    .then(function(data) {
-      if(data.success) {
-        this.setState({
-          title: '',
-          author: ''
-        });
-        window.location.reload()
-      }
-    })
+    this.props.addBook(book)
+
+    this.setState({
+      title: '',
+      author: ''
+    });
   }
 
   onEdit (item) {
@@ -111,66 +84,31 @@ export default class Admin extends Component {
       isDeleted: x.state.edit_delete_state
     }
 
-    fetch("http://localhost:8000/books/edit",
-    {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bookID : item._id,
-        updatedBook
-      })
-    })
-    .then(function(res) {
-      return res.json()
-    })
-    .then(function(data) {
-      if(data.success) {
-        this.setState({
-          editable: false,
-          editedObj: {}
-        });
-        window.location.reload()
-      }
-    })
+    this.props.editBook(item._id, updatedBook)
+
+    this.setState({
+      editable: false,
+      editedObj: {}
+    });
+
+    window.location.reload();
   }
 
   onDelete (item) {
-    let x = this
-    
-    fetch("http://localhost:8000/books/delete",
-    {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bookID : item._id
-      })
-    })
-    .then(function(res) {
-      return res.json()
-    })
-    .then(function(data) {
-      if(data.success) {
-        window.location.reload()
-      }
-    })
+    this.props.deleteBook(item._id);
+    //TODO: why does props not change
+    window.location.reload();
   }
   
   render() {
     let x = this
-    let s = x.state
+    let p = x.props
     return (
       <div className="container">
         <h3>
           Admin Dashboard
         </h3>
         <div className='row'>
-          
           <table className="table table-hover">
             <thead>
               <tr>
@@ -183,7 +121,7 @@ export default class Admin extends Component {
             </thead>
             <tbody>
               {
-                s.books.map((book, index) => (
+                p.books.books.map((book, index) => (
                   <BookCT 
                     key = {index}
                     book = {book} 
@@ -203,37 +141,37 @@ export default class Admin extends Component {
                 <label >Title</label>
                 <input type="text" className="form-control" name='title' id="title"
                         aria-describedby="title" placeholder="Enter title" required 
-                        onChange ={this.handleInputChange}/>
+                        onChange ={x.handleInputChange}/>
               </div>
               <div className="form-group">
                 <label >Author</label>
                 <input type="text" className="form-control" name='author' id="author" placeholder="Enter Author" 
-                        required onChange ={this.handleInputChange}/>
+                        required onChange ={x.handleInputChange}/>
               </div>
-              <button onClick = {() => this.createBook()} className="btn btn-primary">Add New</button>
+              <button onClick = {() => x.createBook()} className="btn btn-primary">Add New</button>
             </form>
           </div>
           {(x.state.editable)
             ?
             <div className="add-ct col-md-8">
-              <h6>Edit Book</h6>
+              <h6 id='edit'>Edit Book</h6>
               <form>
                 <div className="form-group">
                   <label >Title</label>
                   <input type="text" className="form-control" name='edit_title' id="edit_title"
                           aria-describedby="title" placeholder="Enter title" required 
-                          onChange ={this.handleInputChange}/>
+                          onChange ={x.handleInputChange}/>
                 </div>
                 <div className="form-group">
                   <label >Author</label>
                   <input type="text" className="form-control" name='edit_author' id="edit_author" placeholder="Enter Author" 
-                          required onChange ={this.handleInputChange}/>
+                          required onChange ={x.handleInputChange}/>
                 </div>
                 <div className="form-check">
-                  <input type="checkbox" className="form-check-input" name='edit_delete_state' id="edit_delete_state" onChange ={this.handleInputChange}/>
+                  <input type="checkbox" className="form-check-input" name='edit_delete_state' id="edit_delete_state" onChange ={x.handleInputChange}/>
                   <label className="form-check-label" >Deleted</label>
                 </div>
-                <button onClick = {() => this.submitEdit()} className="btn btn-primary">Update</button>
+                <button onClick = {() => x.submitEdit()} className="btn btn-primary">Update</button>
               </form>
             </div>
             :''}
@@ -242,3 +180,20 @@ export default class Admin extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    books: state.booksReducer
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    getBooks: () => dispatch(getBooks()),
+    addBook: (book) => dispatch(addBook(book)),
+    editBook: (id, book) => dispatch(editBook(id,book)),
+    deleteBook: (id) => dispatch(deleteBook(id))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Admin)
