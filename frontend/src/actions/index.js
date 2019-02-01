@@ -46,7 +46,7 @@ export function editBook (bookID, updatedBook) {
       if (res.data.success)
       dispatch({
         type: EDIT_BOOK,
-        payload: res.data.book
+        payload: res.data.books
       })
     }).catch((err) => {
       console.log(err)            
@@ -58,7 +58,6 @@ export function deleteBook (bookID) {
   return function (dispatch) {
     axios.post('/books/delete',{bookID: bookID})
     .then((res) => {
-      console.log('after delete', res)
       if (res.data.success)
         dispatch({
           type: DELETE_BOOK,

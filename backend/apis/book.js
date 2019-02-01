@@ -52,7 +52,7 @@ function editBook (req, res) {
     return Book.find();
   })
   .then(books => {
-    return res.json({success: true, books: updated})
+    return res.json({success: true, books: books})
   })
   .catch((err) => {
     return res.json({success: false, err: err})        

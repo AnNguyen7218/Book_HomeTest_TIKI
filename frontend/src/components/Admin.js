@@ -59,7 +59,6 @@ class Admin extends Component {
   }
 
   onEdit (item) {
-
     this.setState({
       editable: true,
       editedObj: item,
@@ -67,12 +66,6 @@ class Admin extends Component {
       edit_author: item.author,
       edit_delete_state: item.isDeleted
     });
-
-    setTimeout(() => {
-      document.getElementById('edit_title').value = item.title
-      document.getElementById('edit_author').value = item.author
-      document.getElementById('edit_delete_state').checked = item.isDeleted
-    }, 100);
   }
 
   submitEdit () {
@@ -90,8 +83,7 @@ class Admin extends Component {
       editable: false,
       editedObj: {}
     });
-
-    window.location.reload();
+    // window.location.reload();
   }
 
   onDelete (item) {
@@ -160,15 +152,15 @@ class Admin extends Component {
                   <label >Title</label>
                   <input type="text" className="form-control" name='edit_title' id="edit_title"
                           aria-describedby="title" placeholder="Enter title" required 
-                          onChange ={x.handleInputChange}/>
+                          onChange ={x.handleInputChange} value ={x.state.edit_title}/>
                 </div>
                 <div className="form-group">
                   <label >Author</label>
                   <input type="text" className="form-control" name='edit_author' id="edit_author" placeholder="Enter Author" 
-                          required onChange ={x.handleInputChange}/>
+                          required onChange ={x.handleInputChange} value ={x.state.edit_author}/>
                 </div>
                 <div className="form-check">
-                  <input type="checkbox" className="form-check-input" name='edit_delete_state' id="edit_delete_state" onChange ={x.handleInputChange}/>
+                  <input type="checkbox" className="form-check-input" name='edit_delete_state' id="edit_delete_state" onChange ={x.handleInputChange}  checked = {x.state.edit_delete_state}/>
                   <label className="form-check-label" >Deleted</label>
                 </div>
                 <button onClick = {() => x.submitEdit()} className="btn btn-primary">Update</button>

@@ -16,7 +16,8 @@ export default class Book extends Component {
   
   render() {
     let x = this
-    let s = x.state
+    let s = x.props
+
     return (
       <tr>
         <td>{s.book.title}</td>
